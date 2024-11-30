@@ -4,14 +4,16 @@ import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://dev-226erc5bbah42lst.us.auth0.com/.well-known/jwks.json'
 
 export async function handler(event) {
   try {
+    console.log('1111111111', event);
+    
     const jwtToken = await verifyToken(event.authorizationToken)
 
     return {
-      principalId: jwtToken.sub,
+      principalId: jwtToken?.sub,
       policyDocument: {
         Version: '2012-10-17',
         Statement: [
@@ -47,7 +49,7 @@ async function verifyToken(authHeader) {
   const jwt = jsonwebtoken.decode(token, { complete: true })
 
   // TODO: Implement token verification
-  return undefined;
+  return jwt.payload;
 }
 
 function getToken(authHeader) {

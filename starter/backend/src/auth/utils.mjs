@@ -8,6 +8,7 @@ const logger = createLogger('utils')
  * @returns a user id from the JWT token
  */
 export function parseUserId(jwtToken) {
+  console.log('parseUserId', jwtToken)
   const decodedJwt = decode(jwtToken)
   return decodedJwt.sub
 }
