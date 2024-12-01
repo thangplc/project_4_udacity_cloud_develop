@@ -26,6 +26,8 @@ export function EditTodo() {
   }
 
   function handleFileChange(event) {
+    console.log('1111111');
+    
     const files = event.target.files
     if (!files) return
 
@@ -77,8 +79,11 @@ export function EditTodo() {
             placeholder="Image to upload"
             onChange={handleFileChange}
           />
+          {/* <input
+          type='file'
+          /> */}
         </Form.Field>
-
+      2222
         {renderButton()}
       </Form>
     </div>

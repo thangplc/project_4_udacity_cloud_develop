@@ -1,26 +1,19 @@
 import jsonwebtoken from 'jsonwebtoken'
 
-export function getToken(authHeader) {
-  if (!authHeader) throw new Error('No authentication header')
-
-  if (!authHeader.toLowerCase().startsWith('bearer '))
-    throw new Error('Invalid authentication header')
-
-  const split = authHeader.split(' ')
-  const token = split[1]
-
-  return token
+const getToken = (authenticateHeader) => {
+  if (!authenticateHeader) throw new Error('No authentication header')
+  if (!authenticateHeader.toLowerCase().startsWith('bearer ')) throw new Error('Invalid authentication header')
+  return authenticateHeader.split(' ')[1]
 }
 
-export async function verifyToken(authHeader) {
-  const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
-
-  return jwt.payload
+const verifyToken = async (authenticateHeader) => {
+  return jsonwebtoken.decode(getToken(authenticateHeader), { complete: true }).payload
 }
 
-export async function getUserId(authHeader) {
-  console.log('22222222', authHeader);
-  const jwtToken = await verifyToken(authHeader)
-  return jwtToken.sub
+const getUserId = async (authenticateHeader) => {
+  return await verifyToken(authenticateHeader).then((res) => {
+    return res.sub
+  })
 }
+
+export { getToken, verifyToken, getUserId }

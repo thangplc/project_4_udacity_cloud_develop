@@ -20,14 +20,39 @@ export async function handler(event) {
       body: undefined
     }
   } catch (error) {
-    logger.error(`Error: ${error.message}`)
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true
-      },
-      body: JSON.stringify({ error })
-    }
+  logger.error(`Error creating new todo for userId ${userId}: ${error.message}`, {
+    stack: error.stack,
+    input: { newTodo, userId },
+  });
+
+  let statusCode = 500;
+  let errorMessage = 'Internal Server Error';
+
+  if (error.name === 'ValidationError') {
+    statusCode = 400; // Bad Request
+    errorMessage = 'Invalid input data provided.';
+  } else if (error.name === 'ConditionalCheckFailedException') {
+    statusCode = 409; // Conflict
+    errorMessage = 'Todo item already exists or cannot be updated due to conditions.';
+  } else if (error.name === 'AccessDeniedException') {
+    statusCode = 403; // Forbidden
+    errorMessage = 'Access denied. Please check your permissions.';
+  } else if (error.name === 'ServiceUnavailableException') {
+    statusCode = 503; // Service Unavailable
+    errorMessage = 'The service is temporarily unavailable. Please try again later.';
+  }
+
+  // Return error response
+  return {
+    statusCode,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
+    body: JSON.stringify({
+      error: errorMessage,
+      details: error.message,
+    }),
+  };
   }
 }

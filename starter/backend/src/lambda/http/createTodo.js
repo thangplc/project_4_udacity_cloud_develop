@@ -22,14 +22,31 @@ export async function handler(event) {
       })
     }
   } catch (error) {
-    logger.error(`Error: ${error.message}`)
+    logger.error(`Error: ${error.message}`, { error })
+
+    let statusCode = 500
+    let errorMessage = 'An unexpected error occurred.'
+
+    if (error.message.includes('Invalid input')) {
+      statusCode = 400 // Bad Request
+      errorMessage = error.message
+    } else if (error.message.includes('ConditionalCheckFailedException')) {
+      statusCode = 409 // Conflict
+      errorMessage = 'A conflict occurred while processing your request.'
+    } else if (error.message.includes('DynamoDB')) {
+      statusCode = 503 // Service Unavailable
+      errorMessage = 'Database service is temporarily unavailable.'
+    }
+
     return {
-      statusCode: 500,
+      statusCode,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true
       },
-      body: JSON.stringify({ error })
+      body: JSON.stringify({
+        error: errorMessage
+      })
     }
   }
 }
