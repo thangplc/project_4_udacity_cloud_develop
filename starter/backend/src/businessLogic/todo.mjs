@@ -68,7 +68,7 @@ const deleteTodo = (todoId, userId) => {
 }
 
 const generateSignedUrl = async (todoId, userId) => {
-  const { IMAGES_S3_BUCKET: bucketName, SIGNED_URL_EXPIRATION } = process.env
+  const { S3_BUCKET: bucketName, SIGNED_URL_EXPIRATION } = process.env
   const urlExpiration = parseInt(SIGNED_URL_EXPIRATION, 10)
   const s3Client = new S3Client()
   if (!bucketName || !SIGNED_URL_EXPIRATION) {
